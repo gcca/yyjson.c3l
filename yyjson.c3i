@@ -1,0 +1,113 @@
+module yyjson;
+
+typedef Doc = inline void*;
+typedef Val = inline void*;
+typedef MutDoc = inline void*;
+typedef MutVal = inline void*;
+
+alias ReadFlag = uint;
+alias WriteFlag = uint;
+
+const ReadFlag READ_NOFLAG                  = 0;
+const ReadFlag READ_INSITU                  = 1 << 0;
+const ReadFlag READ_STOP_WHEN_DONE          = 1 << 1;
+const ReadFlag READ_ALLOW_TRAILING_COMMAS   = 1 << 2;
+const ReadFlag READ_ALLOW_COMMENTS          = 1 << 3;
+const ReadFlag READ_ALLOW_INF_AND_NAN       = 1 << 4;
+const ReadFlag READ_NUMBER_AS_RAW           = 1 << 5;
+const ReadFlag READ_ALLOW_INVALID_UNICODE   = 1 << 6;
+const ReadFlag READ_BIGNUM_AS_RAW           = 1 << 7;
+const ReadFlag READ_ALLOW_BOM               = 1 << 8;
+const ReadFlag READ_ALLOW_EXT_NUMBER        = 1 << 9;
+const ReadFlag READ_ALLOW_EXT_ESCAPE        = 1 << 10;
+const ReadFlag READ_ALLOW_EXT_WHITESPACE    = 1 << 11;
+const ReadFlag READ_ALLOW_SINGLE_QUOTED_STR = 1 << 12;
+const ReadFlag READ_ALLOW_UNQUOTED_KEY      = 1 << 13;
+
+const WriteFlag WRITE_NOFLAG                = 0;
+const WriteFlag WRITE_PRETTY                = 1 << 0;
+const WriteFlag WRITE_ESCAPE_UNICODE        = 1 << 1;
+const WriteFlag WRITE_ESCAPE_SLASHES        = 1 << 2;
+const WriteFlag WRITE_ALLOW_INF_AND_NAN     = 1 << 3;
+const WriteFlag WRITE_INF_AND_NAN_AS_NULL   = 1 << 4;
+const WriteFlag WRITE_ALLOW_INVALID_UNICODE = 1 << 5;
+const WriteFlag WRITE_PRETTY_TWO_SPACES     = 1 << 6;
+const WriteFlag WRITE_NEWLINE_AT_END        = 1 << 7;
+const WriteFlag WRITE_LOWERCASE_HEX         = 1 << 8;
+
+enum Type : char
+{
+	NONE,
+	RAW,
+	NULL,
+	BOOL,
+	NUM,
+	STR,
+	ARR,
+	OBJ,
+}
+
+struct ReadErr
+{
+	uint code;
+	ZString msg;
+	usz pos;
+}
+
+struct WriteErr
+{
+	uint code;
+	ZString msg;
+}
+
+extern fn Doc yyjson_read_opts(char* dat, usz len, ReadFlag flg, void* alc, ReadErr* err);
+
+extern fn char* yyjson_write_opts(Doc doc, WriteFlag flg, void* alc, usz* len, WriteErr* err);
+
+extern fn char* yyjson_mut_write_opts(MutDoc doc, WriteFlag flg, void* alc, usz* len, WriteErr* err);
+
+extern fn void yyjson_mut_doc_free(MutDoc doc);
+
+extern fn MutDoc yyjson_mut_doc_new(void* alc);
+
+extern fn void yyjsonshim_doc_free(Doc doc);
+
+extern fn Val yyjsonshim_doc_get_root(Doc doc);
+
+extern fn Type yyjsonshim_get_type(Val val);
+
+extern fn usz yyjsonshim_get_len(Val val);
+
+extern fn bool yyjsonshim_is_int(Val val);
+
+extern fn bool yyjsonshim_get_bool(Val val);
+
+extern fn long yyjsonshim_get_sint(Val val);
+
+extern fn double yyjsonshim_get_num(Val val);
+
+extern fn char* yyjsonshim_get_str(Val val);
+
+extern fn Val yyjsonshim_arr_get(Val arr, usz idx);
+
+extern fn Val yyjsonshim_obj_getn(Val obj, char* key, usz key_len);
+
+extern fn void yyjsonshim_mut_doc_set_root(MutDoc doc, MutVal root);
+
+extern fn MutVal yyjsonshim_mut_null(MutDoc doc);
+
+extern fn MutVal yyjsonshim_mut_bool(MutDoc doc, bool val);
+
+extern fn MutVal yyjsonshim_mut_sint(MutDoc doc, long num);
+
+extern fn MutVal yyjsonshim_mut_real(MutDoc doc, double num);
+
+extern fn MutVal yyjsonshim_mut_strncpy(MutDoc doc, char* str, usz len);
+
+extern fn MutVal yyjsonshim_mut_arr(MutDoc doc);
+
+extern fn MutVal yyjsonshim_mut_obj(MutDoc doc);
+
+extern fn bool yyjsonshim_mut_arr_append(MutVal arr, MutVal val);
+
+extern fn bool yyjsonshim_mut_obj_add(MutVal obj, MutVal key, MutVal val);

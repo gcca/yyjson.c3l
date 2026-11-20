@@ -1,0 +1,24 @@
+builddir = build
+
+rule libdir
+  command = mkdir -p $builddir/lib && ln -sfn ../.. $out
+  description = LINK $out
+
+rule c3_test_compile
+  command = c3c compile-test --suppress-run --libdir $builddir/lib --lib yyjson --output-dir $builddir --build-dir $builddir --obj-out $builddir $in
+  description = BUILD yyjson tests
+
+rule c3_test_run
+  command = $builddir/testrun
+  description = TEST yyjson
+
+build $builddir/lib/yyjson.c3l: libdir
+
+build $builddir/testrun: c3_test_compile tests/raw_test.c3 $
+  tests/read_test.c3 $
+  tests/write_test.c3 $
+  tests/roundtrip_test.c3 | yyjson.c3 yyjson.c3i manifest.json 3rd/yyjson.c 3rd/yyjson.h 3rd/yyjsonshim.c 3rd/yyjsonshim.h $builddir/lib/yyjson.c3l
+build always: phony
+build test: c3_test_run $builddir/testrun | always
+
+default test

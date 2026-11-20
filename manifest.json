@@ -1,0 +1,10 @@
+{
+  "provides": "yyjson",
+  "version": "0.1.0",
+  "authors": [ "Cristhian Gonzales Castillo <yo@gcca.dev>" ],
+  "langrev": "1",
+  "sources": [ "yyjson.c3i", "yyjson.c3" ],
+  "c-sources": [ "3rd/yyjson.c", "3rd/yyjsonshim.c" ],
+  "c-include-dirs": [ "3rd" ],
+  "cflags": "-O2"
+}
